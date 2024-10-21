@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'captcha_solver_app/style.css' %}">
+	<title>Captcha Solver</title>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="captcha-solver">
+			<h1 class="captcha-solver__title">Upload</h1>
+			<label for="input-file" class="captcha-solver__drop-area" id="drop-area">
+				<input type="file" accept="image/*" id="input-file" hidden>
+				<div class="captcha-solver__image-view" id="image-view">
+					<img src="{% static 'captcha_solver_app/icon.svg' %}">
+					<p>Drag & drop or click here<br>to upload image</p>
+				</div>
+			</label>
+			<button class="captcha-solver__solve-button">Solve</button>
+		</div>
+	</div>
+	<script src="{% static 'captcha_solver_app/main.js' %}"></script>
+</body>
+</html>
