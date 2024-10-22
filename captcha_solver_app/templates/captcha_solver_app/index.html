@@ -12,17 +12,18 @@
 </head>
 <body>
 	<div class="wrapper">
-		<div class="captcha-solver">
+		<form id="captcha-form" class="captcha-solver">
 			<h1 class="captcha-solver__title">Upload</h1>
 			<label for="input-file" class="captcha-solver__drop-area" id="drop-area">
-				<input type="file" accept="image/*" id="input-file" hidden>
+				<input type="file" accept="image/*" id="input-file" hidden required>
 				<div class="captcha-solver__image-view" id="image-view">
 					<img src="{% static 'captcha_solver_app/icon.svg' %}">
 					<p>Drag & drop or click here<br>to upload image</p>
 				</div>
 			</label>
-			<button class="captcha-solver__solve-button">Solve</button>
-		</div>
+			<input type="text" id="objects-to-detect" class="captcha-solver__objects-to-detect" placeholder="Objects to detect" required>
+			<button type="submit" class="captcha-solver__solve-button">Solve</button>
+		</form>
 	</div>
 	<script src="{% static 'captcha_solver_app/main.js' %}"></script>
 </body>
