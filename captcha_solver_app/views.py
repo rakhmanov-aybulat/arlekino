@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 
-from captcha_solver_app.main import get_solved_image
+from captcha_solver_app.solver import get_solved_image
 
 
 def index(request) -> HttpResponse:

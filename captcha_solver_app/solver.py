@@ -3,6 +3,9 @@ from cv2.typing import MatLike
 import numpy as np
 
 
+Box = tuple[int, int, int, int]
+
+
 def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     """
     recognition and determination of the coordinates of objects on the image
@@ -11,15 +14,16 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     :return: image with marked objects and captions to them
     """
     # Loading YOLO scales from files and setting up the network
+    RESOURCES_PATH = 'captcha_solver_app/resources'
     net = cv2.dnn.readNetFromDarknet(
-            "captcha_solver_app/resources/yolov4-tiny.cfg",
-            "captcha_solver_app/resources/yolov4-tiny.weights",)
+            f'{RESOURCES_PATH}/yolov4-tiny.cfg',
+            f'{RESOURCES_PATH}/yolov4-tiny.weights',)
     layer_names = net.getLayerNames()
     out_layers_indexes = net.getUnconnectedOutLayers()
     out_layers = [layer_names[index - 1] for index in out_layers_indexes]
 
     # Loading from a file of object classes that YOLO can detect
-    with open("captcha_solver_app/resources/coco.names.txt") as file:
+    with open(f'{RESOURCES_PATH}/coco.names.txt') as file:
         classes = file.read().split("\n")
 
 
@@ -39,6 +43,8 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
                                  (0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
     outs = net.forward(out_layers)
+    class_indexes: list[np.intp]
+    boxes: list[Box]
     class_indexes, class_scores, boxes = ([] for _ in range(3))
     objects_count = 0
 
@@ -53,8 +59,8 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
                 center_y = int(obj[1] * height)
                 obj_width = int(obj[2] * width)
                 obj_height = int(obj[3] * height)
-                box = [center_x - obj_width // 2, center_y - obj_height // 2,
-                       obj_width, obj_height]
+                box = (center_x - obj_width // 2, center_y - obj_height // 2,
+                       obj_width, obj_height)
                 boxes.append(box)
                 class_indexes.append(class_index)
                 class_scores.append(float(class_score))
@@ -76,7 +82,8 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     return final_image
 
 
-def draw_object_bounding_box(image_to_process, index, box, classes) -> MatLike:
+def draw_object_bounding_box(image_to_process: MatLike, index: np.intp,
+                             box: Box, classes: list[str]) -> MatLike:
     """
     Drawing object borders with captions
     :param image_to_process: original image
