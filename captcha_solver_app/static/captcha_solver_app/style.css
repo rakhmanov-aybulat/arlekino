@@ -36,7 +36,7 @@ button{
 	justify-content: space-evenly;
 	background-color: #FFFFFF;
 	width: 540px;
-	height: 620px;
+	height: 670px;
 	padding: 30px 48px;
 	border-radius: 4px;
 }
@@ -56,9 +56,19 @@ button{
 	color: #FFFFFF;
 	font-weight: bold;
 }
+.captcha-solver__objects-to-detect {
+	width: 100%;
+	font-size: 14px;
+	background-color: #F8F8FF;
+	border-radius: 4px;
+	padding: 14px;
+	color: #000000;
+	font-weight: bold;
+	border: 1px solid #384EB7;
+}
 .captcha-solver__drop-area {
-	width: 440px;
-	height: 440px;
+	width: 100%;
+	aspect-ratio: 1 / 1;
 }
 .captcha-solver__image-view {
 	width: 100%;

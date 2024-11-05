@@ -20,3 +20,36 @@ dropArea.addEventListener("drop", (event) => {
     uploadImage();
 })
 
+
+const captchaForm = document.getElementById('captcha-form');
+captchaForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const imageFile = inputFile.files[0];
+    const objectsToDetect = document.getElementById('objects-to-detect').value;
+    
+    const base64Image = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(imageFile);
+    });
+    
+    const response = await fetch('/solve/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: new URLSearchParams({
+          image: base64Image,
+          objects: objectsToDetect,
+        }),
+    });
+    
+    const data = await response.json();
+
+    imageView.style.backgroundImage = `url(data:image/png;base64,${data.image})`;
+    imageView.textContent = "";
+    imageView.style.border = 0;
+});
+
