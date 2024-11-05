@@ -23,8 +23,8 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> SolvedImage:
     # Loading YOLO scales from files and setting up the network
     RESOURCES_PATH = 'captcha_solver_app/resources'
     net = cv2.dnn.readNetFromDarknet(
-            f'{RESOURCES_PATH}/yolov4-tiny.cfg',
-            f'{RESOURCES_PATH}/yolov4-tiny.weights',)
+            f'{RESOURCES_PATH}/yolov7-tiny.cfg',
+            f'{RESOURCES_PATH}/yolov7-tiny.weights',)
     layer_names = net.getLayerNames()
     out_layers_indexes = net.getUnconnectedOutLayers()
     out_layers = [layer_names[index - 1] for index in out_layers_indexes]
