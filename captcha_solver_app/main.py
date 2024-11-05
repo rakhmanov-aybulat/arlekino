@@ -3,20 +3,43 @@ from cv2.typing import MatLike
 import numpy as np
 
 
-
-def apply_yolo_object_detection(image_to_process: MatLike) -> MatLike:
+def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     """
-    Recognition and determination of the coordinates of objects on the image
+    recognition and determination of the coordinates of objects on the image
     :param image_to_process: original image
+    :param look_for: objects to detect user input
     :return: image with marked objects and captions to them
     """
+    # Loading YOLO scales from files and setting up the network
+    net = cv2.dnn.readNetFromDarknet(
+            "captcha_solver_app/resources/yolov4-tiny.cfg",
+            "captcha_solver_app/resources/yolov4-tiny.weights",)
+    layer_names = net.getLayerNames()
+    out_layers_indexes = net.getUnconnectedOutLayers()
+    out_layers = [layer_names[index - 1] for index in out_layers_indexes]
+
+    # Loading from a file of object classes that YOLO can detect
+    with open("captcha_solver_app/resources/coco.names.txt") as file:
+        classes = file.read().split("\n")
+
+
+    # Determining classes that will be prioritized for search in an image
+    # The names are in the file coco.names.txt
+
+
+    # Delete spaces
+    list_look_for: list[str] = []
+    for look in look_for.split(','):
+        list_look_for.append(look.strip())
+
+    classes_to_look_for = list_look_for
 
     height, width, _ = image_to_process.shape
     blob = cv2.dnn.blobFromImage(image_to_process, 1 / 255, (608, 608),
                                  (0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
     outs = net.forward(out_layers)
-    class_indexes, class_scores, boxes = ([] for i in range(3))
+    class_indexes, class_scores, boxes = ([] for _ in range(3))
     objects_count = 0
 
     # Starting a search for objects in an image
@@ -46,14 +69,14 @@ def apply_yolo_object_detection(image_to_process: MatLike) -> MatLike:
         # For debugging, we draw objects included in the desired classes
         if classes[class_index] in classes_to_look_for:
             objects_count += 1
-            image_to_process = draw_object_bounding_box(image_to_process,
-                                                        class_index, box)
+            image_to_process = draw_object_bounding_box(
+                    image_to_process, class_index, box, classes)
 
     final_image = draw_object_count(image_to_process, objects_count)
     return final_image
 
 
-def draw_object_bounding_box(image_to_process, index, box):
+def draw_object_bounding_box(image_to_process, index, box, classes) -> MatLike:
     """
     Drawing object borders with captions
     :param image_to_process: original image
@@ -86,7 +109,9 @@ def draw_object_bounding_box(image_to_process, index, box):
 
     return final_image
 
-def draw_object_count(image_to_process: MatLike, objects_count: int):
+
+def draw_object_count(
+        image_to_process: MatLike, objects_count: int) -> MatLike:
     """
     Signature of the number of found objects in the image
     :param image_to_process: original image
@@ -114,51 +139,3 @@ def draw_object_count(image_to_process: MatLike, objects_count: int):
 
     return final_image
 
-
-def start_image_object_detection(img_path):
-    """
-    Image analysis
-    """
-
-    try:
-        # Applying Object Recognition Techniques in an Image by YOLO
-        image = cv2.imread(img_path)
-        target_size = (608, 608)
-        image = cv2.resize(image, target_size)
-        image = apply_yolo_object_detection(image)
-
-        # Displaying the processed image on the screen
-        cv2.imshow("Image", image)
-        if cv2.waitKey(0):
-            cv2.destroyAllWindows()
-
-    except KeyboardInterrupt:
-        pass
-
-
-if __name__ == '__main__':
-
-    # Loading YOLO scales from files and setting up the network
-    net = cv2.dnn.readNetFromDarknet("Resources/yolov4-tiny.cfg", "Resources/yolov4-tiny.weights")
-    layer_names = net.getLayerNames()
-    out_layers_indexes = net.getUnconnectedOutLayers()
-    out_layers = [layer_names[index - 1] for index in out_layers_indexes]
-
-    # Loading from a file of object classes that YOLO can detect
-    with open("Resources/coco.names.txt") as file:
-        classes = file.read().split("\n")
-
-    # Determining classes that will be prioritized for search in an image
-    # The names are in the file coco.names.txt
-
-    image = input("Path to image(recapcha): ")
-    look_for = input("What we are looking for: ").split(',')
-
-    # Delete spaces
-    list_look_for = []
-    for look in look_for:
-        list_look_for.append(look.strip())
-
-    classes_to_look_for = list_look_for
-
-    start_image_object_detection(image)
