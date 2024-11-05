@@ -25,6 +25,9 @@ const captchaForm = document.getElementById('captcha-form');
 captchaForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const title = document.getElementById("title");
+    title.textContent = 'Solving...';
+
     const imageFile = inputFile.files[0];
     const objectsToDetect = document.getElementById('objects-to-detect').value;
     
@@ -33,6 +36,7 @@ captchaForm.addEventListener('submit', async (e) => {
         reader.onloadend = () => resolve(reader.result.split(',')[1]);
         reader.readAsDataURL(imageFile);
     });
+
     
     const response = await fetch('/solve/', {
         method: 'POST',
@@ -46,12 +50,12 @@ captchaForm.addEventListener('submit', async (e) => {
         }),
     });
     
+
     const data = await response.json();
 
+    title.textContent = `Objects Found: ${data.objectsCount}`;
     imageView.style.backgroundImage = `url(data:image/png;base64,${data.image})`;
     imageView.textContent = "";
     imageView.style.border = 0;
-    const title = document.getElementById("title");
-    title.textContent = `Objects Found: ${data.objectsCount}`
 });
 
