@@ -31,10 +31,10 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     # The names are in the file coco.names.txt
 
 
-    # Delete spaces
+    # Remove spaces and case sensitivity
     list_look_for: list[str] = []
     for look in look_for.split(','):
-        list_look_for.append(look.strip())
+        list_look_for.append(look.strip().lower())
 
     classes_to_look_for = list_look_for
 
