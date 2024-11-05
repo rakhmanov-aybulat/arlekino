@@ -1,3 +1,5 @@
+from typing import NamedTuple 
+
 import cv2
 from cv2.typing import MatLike
 import numpy as np
@@ -6,7 +8,12 @@ import numpy as np
 Box = tuple[int, int, int, int]
 
 
-def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
+class SolvedImage(NamedTuple):
+    image: MatLike
+    objects_count: int
+
+
+def get_solved_image(image_to_process: MatLike, look_for: str) -> SolvedImage:
     """
     recognition and determination of the coordinates of objects on the image
     :param image_to_process: original image
@@ -25,11 +32,6 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
     # Loading from a file of object classes that YOLO can detect
     with open(f'{RESOURCES_PATH}/coco.names.txt') as file:
         classes = file.read().split("\n")
-
-
-    # Determining classes that will be prioritized for search in an image
-    # The names are in the file coco.names.txt
-
 
     # Remove spaces and case sensitivity
     list_look_for: list[str] = []
@@ -78,8 +80,7 @@ def get_solved_image(image_to_process: MatLike, look_for: str) -> MatLike:
             image_to_process = draw_object_bounding_box(
                     image_to_process, class_index, box, classes)
 
-    final_image = draw_object_count(image_to_process, objects_count)
-    return final_image
+    return SolvedImage(image=image_to_process, objects_count=objects_count)
 
 
 def draw_object_bounding_box(image_to_process: MatLike, index: np.intp,
@@ -113,36 +114,6 @@ def draw_object_bounding_box(image_to_process: MatLike, index: np.intp,
     # Get the class name to display
     text = classes[index]
     final_image = cv2.putText(final_image, text, text_start, font, font_size, color, text_thickness, cv2.LINE_AA)
-
-    return final_image
-
-
-def draw_object_count(
-        image_to_process: MatLike, objects_count: int) -> MatLike:
-    """
-    Signature of the number of found objects in the image
-    :param image_to_process: original image
-    :param objects_count: the number of objects of the desired class
-    :return: image with labeled number of found objects
-    """
-    height, width, _ = image_to_process.shape
-
-    # Adjust font size and thickness based on image size
-    font_size = min(height, width) * 0.002
-    text_thickness = max(1, int(min(height, width) * 0.002))
-    font = cv2.FONT_HERSHEY_SIMPLEX
-
-    text = f"Objects found: {objects_count}"
-
-    # Positioning text in the bottom-left corner
-    start = (10, int(height * 0.1))
-
-    # Text outline thickness should be larger than the text itself for visibility
-    outline_thickness = text_thickness * 3
-
-    # Draw text with an outline (black background with white text)
-    final_image = cv2.putText(image_to_process, text, start, font, font_size, (0, 0, 0), outline_thickness, cv2.LINE_AA)
-    final_image = cv2.putText(final_image, text, start, font, font_size, (255, 255, 255), text_thickness, cv2.LINE_AA)
 
     return final_image
 

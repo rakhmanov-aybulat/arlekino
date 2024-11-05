@@ -51,5 +51,7 @@ captchaForm.addEventListener('submit', async (e) => {
     imageView.style.backgroundImage = `url(data:image/png;base64,${data.image})`;
     imageView.textContent = "";
     imageView.style.border = 0;
+    const title = document.getElementById("title");
+    title.textContent = `Objects Found: ${data.objectsCount}`
 });
 

@@ -31,12 +31,15 @@ def solve_captcha(request: HttpRequest):
         image = cv2.imdecode(image_as_np, flags=1)
 
 
-        solved_image = get_solved_image(image, objects_to_detect)
+        solved_image, objects_count = \
+                get_solved_image(image, objects_to_detect)
+
         _, solved_image_array = cv2.imencode('.png', solved_image)
         solved_image_bytes = solved_image_array.tobytes()
 
         solved_image_data = \
                 base64.b64encode(solved_image_bytes).decode('utf-8')
 
-        return JsonResponse({'image': solved_image_data})
+        return JsonResponse({'image': solved_image_data,
+                             'objectsCount': objects_count})
 
